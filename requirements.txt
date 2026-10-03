@@ -1,0 +1,8 @@
+# Runtime dependencies. We add each library only in the phase that needs it.
+# Phase 3 (skeleton): none yet.
+#
+# Planned (do NOT install until the phase says so):
+#   Phase 4-7  : pandas, requests, PyYAML
+#   Phase 9    : python-dotenv, the one LLM client library chosen in PD-09
+#   Phase 12   : a PDF library (PD-11)
+#   Phase 14   : Flask

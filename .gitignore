@@ -1,0 +1,21 @@
+# --- Secrets (TB-01): never commit these ---
+.env
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# --- Local database and generated output (rebuilt from data/ files) ---
+*.db
+*.sqlite3
+exports/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
