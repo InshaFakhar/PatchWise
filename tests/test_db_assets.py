@@ -64,9 +64,11 @@ def test_init_db_creates_assets_table():
 def test_init_db_can_run_twice_without_error():
     with tempfile.TemporaryDirectory() as folder:
         db_path = make_db(folder)
-        init_db(db_path)  # second run must not fail or duplicate anything
         with closing(get_connection(db_path)) as conn:
-            assert list_tables(conn) == ["assets"]
+            tables_before = list_tables(conn)
+        init_db(db_path)  # second run must not fail or change anything
+        with closing(get_connection(db_path)) as conn:
+            assert list_tables(conn) == tables_before
 
 
 def test_can_insert_and_read_back_an_asset():
