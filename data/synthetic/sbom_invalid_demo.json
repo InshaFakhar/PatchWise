@@ -1,0 +1,10 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "components": [
+    {"type": "library", "name": "okay-lib", "version": "1.0.0"},
+    {"type": "library", "version": "3.0.0"},
+    {"type": "library", "name": "okay-lib", "version": "1.0.0"},
+    "not-an-object"
+  ]
+}

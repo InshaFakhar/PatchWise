@@ -58,3 +58,15 @@ CREATE TABLE IF NOT EXISTS epss (
                    CHECK (score_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'),
     model_version  TEXT
 );
+-- COMPONENTS: software found in an asset's SBOM (FR-03).
+-- version may be NULL: matching will later label such rows "insufficient data".
+CREATE TABLE IF NOT EXISTS components (
+    component_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id      TEXT NOT NULL REFERENCES assets (asset_id),
+    name          TEXT NOT NULL,
+    version       TEXT,
+    vendor        TEXT,
+    purl          TEXT,
+    cpe           TEXT,
+    UNIQUE (asset_id, name, version)
+);
