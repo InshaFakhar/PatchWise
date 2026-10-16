@@ -1,0 +1,5 @@
+asset_id,hostname,asset_type,criticality,exposure,environment
+D001,demo-ok-01,server,High,DMZ,prod
+D002,demo-bad-01,server,Super,Internal,prod
+D001,demo-dup-01,server,Low,Internal,dev
+D003,,server,Low,Internal,dev

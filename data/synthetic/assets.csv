@@ -1,0 +1,13 @@
+asset_id,hostname,asset_type,criticality,exposure,environment
+A001,web-prod-01,server,Critical,Internet-facing,prod
+A002,api-prod-01,server,High,Internet-facing,prod
+A003,db-prod-01,database,Critical,Internal,prod
+A004,vpn-gw-01,network,High,DMZ,prod
+A005,mail-prod-01,server,Medium,DMZ,prod
+A006,hr-app-01,application,Medium,Internal,prod
+A007,file-srv-01,server,Medium,Internal,prod
+A008,web-stg-01,server,Low,Internet-facing,staging
+A009,api-stg-01,server,Low,Internal,staging
+A010,dev-box-01,workstation,Low,Internal,dev
+A011,build-srv-01,server,Medium,Internal,dev
+A012,intranet-01,application,Low,Internal,prod
