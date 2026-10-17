@@ -1,0 +1,11 @@
+{
+  "title": "PatchWise SYNTHETIC KEV sample (not real CISA data)",
+  "vulnerabilities": [
+    {"cveID": "CVE-2099-0001", "vendorProject": "exampleco", "product": "examplelib",
+     "dateAdded": "2026-01-10", "dueDate": "2026-01-31", "knownRansomwareCampaignUse": "Known"},
+    {"cveID": "CVE-2099-0002", "vendorProject": "sampleorg", "product": "samplehttpd",
+     "dateAdded": "2026-02-05", "dueDate": "2026-02-26", "knownRansomwareCampaignUse": "Unknown"},
+    {"cveID": "CVE-2099-0003", "vendorProject": "democo", "product": "demoparser",
+     "dateAdded": "2026-03-01", "dueDate": "2026-03-22", "knownRansomwareCampaignUse": "Unknown"}
+  ]
+}

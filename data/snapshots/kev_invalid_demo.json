@@ -1,0 +1,11 @@
+{
+  "title": "PatchWise SYNTHETIC invalid KEV demo",
+  "vulnerabilities": [
+    {"cveID": "CVE-2099-0101", "vendorProject": "exampleco", "product": "examplelib",
+     "dateAdded": "2026-04-01", "dueDate": "2026-04-22", "knownRansomwareCampaignUse": "Unknown"},
+    {"cveID": "NOT-A-CVE", "vendorProject": "exampleco", "product": "examplelib",
+     "dateAdded": "2026-04-01"},
+    {"cveID": "CVE-2099-0102", "vendorProject": "exampleco", "product": "examplelib",
+     "dateAdded": "2026-13-45"}
+  ]
+}

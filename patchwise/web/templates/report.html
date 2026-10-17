@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ view.title }} - PatchWise{% endblock %}
+{% block content %}
+<h1 class="h3">{{ view.title }}</h1>
+
+{% if view.stats %}
+<ul class="list-inline">
+  {% for label, value in view.stats %}
+    <li class="list-inline-item"><span class="badge bg-secondary">{{ label }}: {{ value }}</span></li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if view.has_errors %}
+  <div class="alert alert-warning">Some records were rejected. Valid records (if any) were still imported.</div>
+  <table class="table table-sm">
+    <thead><tr><th>Where</th><th>Problem</th></tr></thead>
+    <tbody>
+    {% for where, message in view.errors %}
+      <tr><td>{{ where }}</td><td>{{ message }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="alert alert-success">No problems found.</div>
+{% endif %}
+
+<a href="/upload">&larr; Upload another file</a> | <a href="/">View assets</a>
+{% endblock %}

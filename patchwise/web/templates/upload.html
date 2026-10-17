@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Upload - PatchWise{% endblock %}
+{% block content %}
+<h1 class="h3">Upload</h1>
+
+<div class="card mb-4"><div class="card-body">
+  <h2 class="h5">1. Asset inventory (CSV)</h2>
+  <form action="/upload/inventory" method="post" enctype="multipart/form-data">
+    <input class="form-control mb-2" type="file" name="file" accept=".csv" required>
+    <button class="btn btn-primary" type="submit">Import inventory</button>
+  </form>
+</div></div>
+
+<div class="card mb-4"><div class="card-body">
+  <h2 class="h5">2. SBOM (CycloneDX JSON) for one asset</h2>
+  {% if not assets %}
+    <div class="alert alert-warning mb-0">Import an inventory first, then you can attach SBOMs to assets.</div>
+  {% else %}
+  <form action="/upload/sbom" method="post" enctype="multipart/form-data">
+    <select class="form-select mb-2" name="asset_id" required>
+      {% for a in assets %}
+        <option value="{{ a.asset_id }}">{{ a.asset_id }} - {{ a.hostname }}</option>
+      {% endfor %}
+    </select>
+    <input class="form-control mb-2" type="file" name="file" accept=".json" required>
+    <button class="btn btn-primary" type="submit">Import SBOM</button>
+  </form>
+  {% endif %}
+</div></div>
+{% endblock %}

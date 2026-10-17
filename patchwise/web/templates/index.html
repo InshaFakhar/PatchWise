@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Assets - PatchWise{% endblock %}
+{% block content %}
+<h1 class="h3">Assets</h1>
+{% if not assets %}
+  <div class="alert alert-info">No assets yet. Go to <a href="/upload">Upload</a> and import an inventory CSV.</div>
+{% else %}
+  <table class="table table-striped table-sm">
+    <thead><tr>
+      <th>ID</th><th>Hostname</th><th>Type</th><th>Criticality</th>
+      <th>Exposure</th><th>Environment</th><th>Components</th>
+    </tr></thead>
+    <tbody>
+    {% for a in assets %}
+      <tr>
+        <td><a href="/assets/{{ a.asset_id }}">{{ a.asset_id }}</a></td>
+        <td>{{ a.hostname }}</td>
+        <td>{{ a.asset_type }}</td>
+        <td>{{ a.criticality }}</td>
+        <td>{{ a.exposure }}</td>
+        <td>{{ a.environment }}</td>
+        <td>{{ a.component_count }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

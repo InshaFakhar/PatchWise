@@ -70,3 +70,18 @@ CREATE TABLE IF NOT EXISTS components (
     cpe           TEXT,
     UNIQUE (asset_id, name, version)
 );
+
+-- DATA_FETCH_LOG: one row per load of a public data source (FR-02).
+-- Records WHAT was loaded, FROM where, WHEN, and how it went.
+CREATE TABLE IF NOT EXISTS data_fetch_log (
+    log_id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    source            TEXT NOT NULL CHECK (source IN ('NVD', 'KEV', 'EPSS')),
+    origin            TEXT NOT NULL,
+    mode              TEXT NOT NULL CHECK (mode IN ('snapshot', 'live')),
+    fetched_at        TEXT NOT NULL,
+    records_read      INTEGER NOT NULL,
+    records_loaded    INTEGER NOT NULL,
+    records_rejected  INTEGER NOT NULL,
+    status            TEXT NOT NULL CHECK (status IN ('ok', 'partial', 'failed')),
+    note              TEXT
+);
