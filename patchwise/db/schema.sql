@@ -85,3 +85,22 @@ CREATE TABLE IF NOT EXISTS data_fetch_log (
     status            TEXT NOT NULL CHECK (status IN ('ok', 'partial', 'failed')),
     note              TEXT
 );
+
+-- CVE_AFFECTED_PRODUCTS: which software/version ranges each CVE affects (FR-02).
+-- Source: the NVD "configurations" -> "cpeMatch" entries marked vulnerable.
+-- No version columns filled = the CVE applies to ALL versions of that product.
+CREATE TABLE IF NOT EXISTS cve_affected_products (
+    id                       INTEGER PRIMARY KEY AUTOINCREMENT,
+    cve_id                   TEXT NOT NULL REFERENCES cves (cve_id),
+    cpe_part                 TEXT NOT NULL CHECK (cpe_part IN ('a', 'o', 'h')),
+    vendor                   TEXT NOT NULL,
+    product                  TEXT NOT NULL,
+    version_exact            TEXT,
+    version_start_including  TEXT,
+    version_start_excluding  TEXT,
+    version_end_including    TEXT,
+    version_end_excluding    TEXT,
+    cpe_criteria             TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_affected_product ON cve_affected_products (product);
+CREATE INDEX IF NOT EXISTS idx_affected_cve ON cve_affected_products (cve_id);

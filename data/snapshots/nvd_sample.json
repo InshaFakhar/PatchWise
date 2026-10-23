@@ -1,0 +1,73 @@
+{
+  "_note": "PatchWise SYNTHETIC NVD-style sample (not real NVD data). Layout follows the NVD CVE API 2.0.",
+  "resultsPerPage": 6,
+  "startIndex": 0,
+  "totalResults": 6,
+  "format": "NVD_CVE",
+  "version": "2.0",
+  "timestamp": "2026-10-15T00:00:00.000",
+  "vulnerabilities": [
+    {"cve": {
+      "id": "CVE-2099-0001",
+      "published": "2026-01-05T10:15:09.143",
+      "vulnStatus": "Analyzed",
+      "descriptions": [
+        {"lang": "en", "value": "SYNTHETIC: examplelib before 2.4.0 allows remote code execution."},
+        {"lang": "es", "value": "SINTETICO: examplelib anterior a 2.4.0 permite ejecucion remota de codigo."}
+      ],
+      "metrics": {"cvssMetricV31": [{"type": "Primary", "cvssData": {
+        "version": "3.1", "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H", "baseScore": 8.1}}]},
+      "configurations": [{"nodes": [{"operator": "OR", "negate": false, "cpeMatch": [
+        {"vulnerable": true, "criteria": "cpe:2.3:a:exampleco:examplelib:*:*:*:*:*:*:*:*",
+         "versionEndExcluding": "2.4.0"}]}]}]
+    }},
+    {"cve": {
+      "id": "CVE-2099-0002",
+      "published": "2026-02-01T08:00:00.000",
+      "vulnStatus": "Analyzed",
+      "descriptions": [{"lang": "en", "value": "SYNTHETIC: samplehttpd 5.0.0 to 5.2.0 has an authentication bypass."}],
+      "metrics": {"cvssMetricV31": [{"type": "Primary", "cvssData": {
+        "version": "3.1", "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H", "baseScore": 9.8}}]},
+      "configurations": [{"nodes": [{"operator": "OR", "negate": false, "cpeMatch": [
+        {"vulnerable": true, "criteria": "cpe:2.3:a:sampleorg:samplehttpd:*:*:*:*:*:*:*:*",
+         "versionStartIncluding": "5.0.0", "versionEndIncluding": "5.2.0"}]}]}]
+    }},
+    {"cve": {
+      "id": "CVE-2099-0003",
+      "published": "2026-02-20T12:30:00.000",
+      "vulnStatus": "Analyzed",
+      "descriptions": [{"lang": "en", "value": "SYNTHETIC: demoparser 1.0.4 leaks memory when parsing crafted files."}],
+      "metrics": {"cvssMetricV30": [{"type": "Primary", "cvssData": {
+        "version": "3.0", "vectorString": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L", "baseScore": 5.3}}]},
+      "configurations": [{"nodes": [{"operator": "OR", "negate": false, "cpeMatch": [
+        {"vulnerable": true, "criteria": "cpe:2.3:a:democo:demoparser:1.0.4:*:*:*:*:*:*:*"}]}]}]
+    }},
+    {"cve": {
+      "id": "CVE-2099-0004",
+      "published": "2026-03-10T09:00:00.000",
+      "vulnStatus": "Analyzed",
+      "descriptions": [{"lang": "en", "value": "SYNTHETIC boundary case: examplelib after 2.3.1 and before 3.0.0 (2.3.1 itself is NOT affected)."}],
+      "metrics": {"cvssMetricV31": [{"type": "Primary", "cvssData": {
+        "version": "3.1", "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N", "baseScore": 6.5}}]},
+      "configurations": [{"nodes": [{"operator": "OR", "negate": false, "cpeMatch": [
+        {"vulnerable": true, "criteria": "cpe:2.3:a:exampleco:examplelib:*:*:*:*:*:*:*:*",
+         "versionStartExcluding": "2.3.1", "versionEndExcluding": "3.0.0"}]}]}]
+    }},
+    {"cve": {
+      "id": "CVE-2099-0005",
+      "published": "2026-09-30T00:00:00.000",
+      "vulnStatus": "Awaiting Analysis",
+      "descriptions": [{"lang": "en", "value": "SYNTHETIC: newly published, not yet analyzed (no CVSS, no affected products)."}]
+    }},
+    {"cve": {
+      "id": "CVE-2099-0006",
+      "published": "2026-04-01T00:00:00.000",
+      "vulnStatus": "Analyzed",
+      "descriptions": [{"lang": "en", "value": "SYNTHETIC: mystery-lib, all versions affected, only an old CVSS v2 score exists."}],
+      "metrics": {"cvssMetricV2": [{"type": "Primary", "cvssData": {
+        "version": "2.0", "vectorString": "AV:N/AC:L/Au:N/C:P/I:P/A:P", "baseScore": 7.5}}]},
+      "configurations": [{"nodes": [{"operator": "OR", "negate": false, "cpeMatch": [
+        {"vulnerable": true, "criteria": "cpe:2.3:a:mysteryco:mystery-lib:*:*:*:*:*:*:*:*"}]}]}]
+    }}
+  ]
+}

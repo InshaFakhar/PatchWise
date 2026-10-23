@@ -1,0 +1,25 @@
+{
+  "_note": "PatchWise SYNTHETIC invalid NVD demo: 1 good CVE and 5 deliberately broken entries.",
+  "vulnerabilities": [
+    {"cve": {
+      "id": "CVE-2099-0201",
+      "published": "2026-05-01T00:00:00.000",
+      "descriptions": [{"lang": "en", "value": "SYNTHETIC: the one valid entry."}],
+      "metrics": {"cvssMetricV31": [{"type": "Primary", "cvssData": {
+        "version": "3.1", "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L", "baseScore": 7.3}}]},
+      "configurations": [{"nodes": [{"cpeMatch": [
+        {"vulnerable": true, "criteria": "cpe:2.3:a:exampleco:examplelib:*:*:*:*:*:*:*:*", "versionEndExcluding": "9.0.0"}]}]}]
+    }},
+    {"cve": {"id": "CVE-99-1", "descriptions": [{"lang": "en", "value": "bad id"}]}},
+    {"cve": {
+      "id": "CVE-2099-0202",
+      "metrics": {"cvssMetricV31": [{"type": "Primary", "cvssData": {"version": "3.1", "baseScore": 11.5}}]}
+    }},
+    {"cve": {"id": "CVE-2099-0203", "published": "2026-02-30T00:00:00.000"}},
+    "oops, not an object",
+    {"cve": {
+      "id": "CVE-2099-0204",
+      "configurations": [{"nodes": [{"cpeMatch": [{"vulnerable": true, "criteria": "cpe:2.3:a:onlyvendor"}]}]}]
+    }}
+  ]
+}
