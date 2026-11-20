@@ -1,0 +1,9 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "components": [
+    {"type": "application", "name": "samplehttpd", "version": "5.1.0", "group": "otherorg"},
+    {"type": "library", "name": "examplelib", "version": "2.10.0", "group": "exampleco"},
+    {"type": "library", "name": "demoparser", "version": "1.0.4-1"}
+  ]
+}

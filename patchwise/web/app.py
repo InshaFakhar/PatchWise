@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from patchwise import services
@@ -36,6 +37,19 @@ def create_app(db_path=None):
         if asset is None:
             raise HTTPException(status_code=404, detail="Asset not found")
         return templates.TemplateResponse(request, "asset.html", {"asset": asset})
+
+    @app.get("/findings")
+    def findings(request: Request):
+        rows = services.list_findings(db_path)
+        counts = services.count_by_status(rows)
+        return templates.TemplateResponse(
+            request, "findings.html", {"findings": rows, "counts": counts}
+        )
+
+    @app.post("/matching/run")
+    def matching_run():
+        services.run_matching(db_path)
+        return RedirectResponse("/findings", status_code=303)
 
     @app.get("/upload")
     def upload_form(request: Request):

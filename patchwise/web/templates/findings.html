@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Findings - PatchWise{% endblock %}
+{% block content %}
+{% set badge = {'confirmed': 'success', 'probable': 'primary', 'uncertain': 'warning', 'insufficient_data': 'secondary'} %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Findings</h1>
+  <form action="/matching/run" method="post">
+    <button class="btn btn-primary btn-sm" type="submit">Run matching</button>
+  </form>
+</div>
+
+<p class="text-muted">
+  Which installed software may be affected by which CVE, and how sure we are.
+  Sorted by certainty, <strong>not</strong> by priority (the ranking engine comes later).
+</p>
+
+<ul class="list-inline">
+  {% for status, n in counts.items() %}
+    <li class="list-inline-item">
+      <span class="badge bg-{{ badge[status] }}">{{ status.replace('_', ' ') }}: {{ n }}</span>
+    </li>
+  {% endfor %}
+</ul>
+
+{% if not findings %}
+  <div class="alert alert-info">
+    No findings yet. Import an inventory, SBOMs and public data, then press <strong>Run matching</strong>.
+  </div>
+{% else %}
+  <div class="table-responsive">
+  <table class="table table-striped table-sm align-middle">
+    <thead><tr>
+      <th>Status</th><th>Asset</th><th>Software</th><th>CVE</th>
+      <th>CVSS</th><th>KEV</th><th>EPSS</th><th>Why</th>
+    </tr></thead>
+    <tbody>
+    {% for f in findings %}
+      <tr>
+        <td><span class="badge bg-{{ badge[f.status] }}">{{ f.status.replace('_', ' ') }}</span></td>
+        <td><a href="/assets/{{ f.asset_id }}">{{ f.hostname }}</a>
+            <div class="small text-muted">{{ f.criticality }}, {{ f.exposure }}</div></td>
+        <td>{{ f.component }} {{ f.component_version or "(version unknown)" }}</td>
+        <td>{{ f.cve_id }}</td>
+        <td>{{ f.cvss_score if f.cvss_score is not none else "unknown" }}</td>
+        <td>{% if f.in_kev %}yes{% if f.known_ransomware_use == 'Known' %} (ransomware){% endif %}{% else %}no{% endif %}</td>
+        <td>{{ "%.2f"|format(f.epss_score) if f.epss_score is not none else "n/a" }}</td>
+        <td class="small">{{ f.reason }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% endif %}
+{% endblock %}

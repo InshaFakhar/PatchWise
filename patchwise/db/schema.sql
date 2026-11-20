@@ -104,3 +104,20 @@ CREATE TABLE IF NOT EXISTS cve_affected_products (
 );
 CREATE INDEX IF NOT EXISTS idx_affected_product ON cve_affected_products (product);
 CREATE INDEX IF NOT EXISTS idx_affected_cve ON cve_affected_products (cve_id);
+
+-- MATCHES: which component is affected by which CVE, and HOW SURE we are (FR-04).
+-- status: confirmed | probable | uncertain | insufficient_data
+-- The whole table is recomputed every time matching runs (same data -> same rows).
+CREATE TABLE IF NOT EXISTS matches (
+    match_id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    component_id      INTEGER NOT NULL REFERENCES components (component_id),
+    cve_id            TEXT NOT NULL REFERENCES cves (cve_id),
+    status            TEXT NOT NULL
+                      CHECK (status IN ('confirmed', 'probable', 'uncertain', 'insufficient_data')),
+    name_evidence     TEXT NOT NULL,
+    version_evidence  TEXT NOT NULL,
+    reason            TEXT NOT NULL,
+    affected_cpe      TEXT,
+    UNIQUE (component_id, cve_id)
+);
+CREATE INDEX IF NOT EXISTS idx_matches_status ON matches (status);
