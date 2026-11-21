@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Ranking - PatchWise{% endblock %}
+{% block content %}
+{% set badge = {'confirmed': 'success', 'probable': 'primary', 'uncertain': 'warning', 'insufficient_data': 'secondary'} %}
+<h1 class="h3">Priority ranking</h1>
+<p class="text-muted">
+  Score (0 to 100) = weighted sum of five factors. The score is computed by a fixed formula;
+  no AI is involved. <strong>CVSS-only #</strong> shows where the same finding would rank if only
+  the CVSS severity were used (&#9650; = PatchWise puts it higher).
+</p>
+
+<p>
+  Weights (initial values, to be validated):
+  {% for label, share in weights %}
+    <span class="badge bg-dark">{{ label }} {{ "%.0f"|format(share) }}%</span>
+  {% endfor %}
+</p>
+
+{% if not ranked %}
+  <div class="alert alert-info">
+    Nothing to rank yet. Open <a href="/findings">Findings</a> and press <strong>Run matching</strong> first.
+  </div>
+{% else %}
+  <div class="table-responsive">
+  <table class="table table-striped table-sm align-middle">
+    <thead><tr>
+      <th>#</th><th>Score</th><th>Match</th><th>Asset</th><th>Software</th><th>CVE</th>
+      <th title="points from CVSS">CVSS</th><th title="points from EPSS">EPSS</th>
+      <th title="points from KEV">KEV</th><th title="points from asset criticality">Crit.</th>
+      <th title="points from asset exposure">Exp.</th><th>CVSS-only #</th>
+    </tr></thead>
+    <tbody>
+    {% for r in ranked %}
+      {% set d = r.cvss_rank - r.rank %}
+      <tr>
+        <td><strong>{{ r.rank }}</strong></td>
+        <td><strong>{{ "%.1f"|format(r.score) }}</strong></td>
+        <td><span class="badge bg-{{ badge[r.status] }}" title="{{ r.reason }}">{{ r.status.replace('_', ' ') }}</span></td>
+        <td><a href="/assets/{{ r.asset_id }}">{{ r.hostname }}</a>
+            <div class="small text-muted">{{ r.criticality }}, {{ r.exposure }}</div></td>
+        <td>{{ r.component }} {{ r.component_version or "(version unknown)" }}</td>
+        <td>{{ r.cve_id }}</td>
+        {% for name in ['cvss', 'epss', 'kev', 'criticality', 'exposure'] %}
+          {% set f = r.factors[name] %}
+          <td>{% if f.unknown %}<span class="text-muted">unknown</span>{% else %}{{ "%.1f"|format(f.points) }}{% endif %}</td>
+        {% endfor %}
+        <td>{{ r.cvss_rank }}
+          {% if d > 0 %}<span class="text-success">&#9650;{{ d }}</span>
+          {% elif d < 0 %}<span class="text-danger">&#9660;{{ -d }}</span>
+          {% else %}<span class="text-muted">=</span>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  <h2 class="h5 mt-4">How stable is this ranking?</h2>
+  <p class="text-muted small">
+    Each row changes <strong>one</strong> weight by 50% and re-ranks. Similarity 1.00 means the order is
+    unchanged, 0 means unrelated, -1.00 means reversed. If small changes keep the similarity high, the
+    ranking does not depend on the exact weights.
+  </p>
+  <table class="table table-sm w-auto">
+    <thead><tr><th>Weight changed</th><th>Change</th><th>Similarity to current order</th><th>Same top items</th><th>#1 unchanged</th></tr></thead>
+    <tbody>
+    {% for s in sensitivity %}
+      <tr>
+        <td>{{ s.label }}</td>
+        <td>{{ s.change }}</td>
+        <td>{{ "%.2f"|format(s.tau) if s.tau is not none else "n/a" }}</td>
+        <td>{% if s.top_k_agreement is not none %}{{ (s.top_k_agreement * s.top_k)|round|int }}/{{ s.top_k }}{% else %}n/a{% endif %}</td>
+        <td>{{ "yes" if s.top1_unchanged else "no" }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

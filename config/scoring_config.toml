@@ -1,0 +1,24 @@
+# PatchWise scoring settings (FR-05).
+# These are INITIAL values. They are not final: they will be justified with the
+# literature review and checked with sensitivity testing (see ranking/analysis.py).
+#
+# Weights are relative: only their proportions matter (20/25/25/15/15 is the
+# same as 4/5/5/3/3). A factor with weight 0 is ignored.
+
+[weights]
+cvss = 20          # how severe the vulnerability is (CVSS score / 10)
+epss = 25          # chance of exploitation in the next 30 days (0..1)
+kev = 25           # 1 if CISA lists it as exploited in the wild, else 0
+criticality = 15   # how important the asset is (mapping below)
+exposure = 15      # how reachable the asset is (mapping below)
+
+[criticality]
+Low = 0.25
+Medium = 0.5
+High = 0.75
+Critical = 1.0
+
+[exposure]
+Internal = 0.33
+DMZ = 0.67
+Internet-facing = 1.0

@@ -46,6 +46,17 @@ def create_app(db_path=None):
             request, "findings.html", {"findings": rows, "counts": counts}
         )
 
+    @app.get("/ranking")
+    def ranking(request: Request):
+        return templates.TemplateResponse(
+            request, "ranking.html",
+            {
+                "ranked": services.list_ranked(db_path),
+                "weights": services.weight_shares(),
+                "sensitivity": services.sensitivity_report(db_path),
+            },
+        )
+
     @app.post("/matching/run")
     def matching_run():
         services.run_matching(db_path)

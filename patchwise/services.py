@@ -11,6 +11,7 @@ from patchwise.db.connection import get_connection, init_db
 from patchwise.ingest.inventory import import_inventory
 from patchwise.ingest.sbom import import_sbom
 from patchwise.matching import matcher
+from patchwise.ranking import analysis, scoring
 
 MAX_UPLOAD_BYTES = 1_000_000  # 1 MB is plenty for our CSV / SBOM files
 
@@ -110,6 +111,34 @@ def count_by_status(findings):
     for f in findings:
         counts[f["status"]] += 1
     return counts
+
+
+# ---------- ranking ----------
+
+def list_ranked(db_path=None, config=None):
+    """Findings with a priority score, its breakdown and the CVSS-only rank (best first).
+
+    'rank' comes from the PatchWise score, 'cvss_rank' from CVSS alone (the baseline).
+    """
+    cfg = config if config is not None else scoring.get_config()
+    findings = list_findings(db_path)
+    ranked = scoring.rank_findings(findings, cfg)
+    baseline = {f["match_id"]: f["cvss_rank"] for f in scoring.rank_cvss_only(findings)}
+    for item in ranked:
+        item["cvss_rank"] = baseline[item["match_id"]]
+    return ranked
+
+
+def weight_shares(config=None):
+    """[('CVSS', 20.0), ('EPSS', 25.0), ...]: the weights as percentages, in display order."""
+    shares = scoring.weight_shares(config)
+    return [(scoring.FACTOR_LABELS[f], shares[f]) for f in scoring.FACTORS]
+
+
+def sensitivity_report(db_path=None, config=None):
+    """How much does the ranking change if one weight changes by +/-50 percent?"""
+    cfg = config if config is not None else scoring.get_config()
+    return analysis.sensitivity(list_findings(db_path), cfg)
 
 
 # ---------- uploads ----------
