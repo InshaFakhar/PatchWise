@@ -1,9 +1,10 @@
 """FastAPI web interface. Routes are thin: they call patchwise.services."""
 
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
 from patchwise import services
@@ -56,6 +57,56 @@ def create_app(db_path=None):
                 "sensitivity": services.sensitivity_report(db_path),
             },
         )
+
+    @app.get("/queue")
+    def queue_page(request: Request):
+        queue = services.list_queue(db_path)
+        error = request.query_params.get("error", "")[:200]
+        return templates.TemplateResponse(
+            request, "queue.html",
+            {
+                "queue": queue,
+                "counts": services.queue_counts(queue),
+                "analyst": request.cookies.get("analyst", ""),
+                "error": error,
+            },
+        )
+
+    @app.post("/review/decide")
+    def review_decide(
+        component_id: str = Form(""),
+        cve_id: str = Form(""),
+        action: str = Form(""),
+        reason: str = Form(""),
+        analyst: str = Form(""),
+    ):
+        try:
+            services.record_decision(component_id, cve_id, action, reason, analyst, db_path)
+        except ValueError as exc:
+            return RedirectResponse("/queue?error=" + quote(str(exc)[:200]), status_code=303)
+        response = RedirectResponse("/queue", status_code=303)
+        response.set_cookie("analyst", analyst.strip()[:80], httponly=True, samesite="lax")
+        return response
+
+    @app.get("/audit")
+    def audit_page(request: Request):
+        return templates.TemplateResponse(
+            request, "audit.html", {"history": services.list_audit(db_path)})
+
+    @app.get("/export/queue.csv")
+    def export_csv():
+        # utf-8 with a byte-order mark so Excel opens non-English text correctly
+        body = services.export_queue_csv(db_path).encode("utf-8-sig")
+        return Response(
+            body, media_type="text/csv; charset=utf-8",
+            headers={"Content-Disposition": 'attachment; filename="patchwise_queue.csv"'})
+
+    @app.get("/export/queue.md")
+    def export_markdown():
+        body = services.export_queue_markdown(db_path).encode("utf-8")
+        return Response(
+            body, media_type="text/markdown; charset=utf-8",
+            headers={"Content-Disposition": 'attachment; filename="patchwise_queue.md"'})
 
     @app.post("/matching/run")
     def matching_run():

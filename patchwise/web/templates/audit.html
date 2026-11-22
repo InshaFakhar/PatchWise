@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Audit history - PatchWise{% endblock %}
+{% block content %}
+<h1 class="h3">Audit history</h1>
+<p class="text-muted">
+  Every Accept, Bump and Defer decision, newest first. This history is append-only:
+  decisions are never edited or deleted. The PatchWise rank and score shown are the values at the moment of the decision.
+</p>
+{% if not history %}
+  <div class="alert alert-info">No decisions yet. Make one on the <a href="/queue">Review queue</a>.</div>
+{% else %}
+  <div class="table-responsive">
+  <table class="table table-striped table-sm">
+    <thead><tr>
+      <th>Time (UTC)</th><th>Analyst</th><th>Decision</th><th>Asset</th><th>Software</th>
+      <th>CVE</th><th>Rank then</th><th>Score then</th><th>Reason</th>
+    </tr></thead>
+    <tbody>
+    {% for h in history %}
+      {% set colour = {'bump': 'danger', 'accept': 'success', 'defer': 'secondary'}[h.action] %}
+      <tr>
+        <td>{{ h.decided_at }}</td>
+        <td>{{ h.analyst_name }}</td>
+        <td><span class="badge bg-{{ colour }}">{{ h.action }}</span></td>
+        <td>{{ h.hostname }}</td>
+        <td>{{ h.component }} {{ h.component_version or "(version unknown)" }}</td>
+        <td>{{ h.cve_id }}</td>
+        <td>{{ h.rank_at_decision if h.rank_at_decision is not none else "-" }}</td>
+        <td>{{ "%.1f"|format(h.score_at_decision) if h.score_at_decision is not none else "-" }}</td>
+        <td>{{ h.reason }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% endif %}
+{% endblock %}

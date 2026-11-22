@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Review queue - PatchWise{% endblock %}
+{% block content %}
+{% set badge = {'confirmed': 'success', 'probable': 'primary', 'uncertain': 'warning', 'insufficient_data': 'secondary'} %}
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h1 class="h3 mb-0">Review queue</h1>
+  <div>
+    <a class="btn btn-outline-secondary btn-sm" href="/export/queue.csv">Export CSV</a>
+    <a class="btn btn-outline-secondary btn-sm" href="/export/queue.md">Export Markdown</a>
+  </div>
+</div>
+<p class="text-muted">
+  The PatchWise ranking with the analyst's decisions applied: <strong>bumped</strong> findings first,
+  <strong>deferred</strong> findings last. A decision never changes the PatchWise score.
+  Every decision needs a reason and is kept in the <a href="/audit">audit history</a>.
+</p>
+
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+<p>
+  <span class="badge bg-danger">bumped: {{ counts.bump }}</span>
+  <span class="badge bg-success">accepted: {{ counts.accept }}</span>
+  <span class="badge bg-secondary">deferred: {{ counts.defer }}</span>
+  <span class="badge bg-light text-dark border">undecided: {{ counts.undecided }}</span>
+</p>
+
+{% if not queue %}
+  <div class="alert alert-info">Nothing to review yet. Open <a href="/findings">Findings</a> and press <strong>Run matching</strong> first.</div>
+{% else %}
+  <div class="table-responsive">
+  <table class="table table-striped table-sm align-middle">
+    <thead><tr>
+      <th>Queue #</th><th>PatchWise #</th><th>Score</th><th>Decision</th><th>Match</th>
+      <th>Asset</th><th>Software</th><th>CVE</th><th>Your decision</th>
+    </tr></thead>
+    <tbody>
+    {% for r in queue %}
+      <tr>
+        <td><strong>{{ r.queue_position }}</strong></td>
+        <td>{{ r.rank }}</td>
+        <td>{{ "%.1f"|format(r.score) }}</td>
+        <td>
+          {% if r.decision %}
+            {% set colour = {'bump': 'danger', 'accept': 'success', 'defer': 'secondary'}[r.decision.action] %}
+            <span class="badge bg-{{ colour }}">{{ r.decision.action }}</span>
+            <div class="small">{{ r.decision.analyst_name }}: {{ r.decision.reason }}</div>
+          {% else %}<span class="text-muted">none</span>{% endif %}
+        </td>
+        <td><span class="badge bg-{{ badge[r.status] }}" title="{{ r.reason }}">{{ r.status.replace('_', ' ') }}</span></td>
+        <td><a href="/assets/{{ r.asset_id }}">{{ r.hostname }}</a>
+            <div class="small text-muted">{{ r.criticality }}, {{ r.exposure }}</div></td>
+        <td>{{ r.component }} {{ r.component_version or "(version unknown)" }}</td>
+        <td>{{ r.cve_id }}</td>
+        <td>
+          <form action="/review/decide" method="post" class="d-flex gap-1">
+            <input type="hidden" name="component_id" value="{{ r.component_id }}">
+            <input type="hidden" name="cve_id" value="{{ r.cve_id }}">
+            <select name="action" class="form-select form-select-sm w-auto">
+              <option value="accept">Accept</option>
+              <option value="bump">Bump</option>
+              <option value="defer">Defer</option>
+            </select>
+            <input name="reason" class="form-control form-control-sm" placeholder="Reason (required)" maxlength="500" required>
+            <input name="analyst" class="form-control form-control-sm" placeholder="Your name" maxlength="80" value="{{ analyst }}" required>
+            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% endif %}
+{% endblock %}

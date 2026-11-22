@@ -11,7 +11,9 @@ from patchwise.db.connection import get_connection, init_db
 from patchwise.ingest.inventory import import_inventory
 from patchwise.ingest.sbom import import_sbom
 from patchwise.matching import matcher
+from patchwise.export import reports
 from patchwise.ranking import analysis, scoring
+from patchwise.review import decisions, queue as review_queue
 
 MAX_UPLOAD_BYTES = 1_000_000  # 1 MB is plenty for our CSV / SBOM files
 
@@ -79,7 +81,7 @@ def list_findings(db_path=None):
     try:
         rows = conn.execute(
             """
-            SELECT m.match_id, m.status, m.name_evidence, m.version_evidence, m.reason,
+            SELECT m.match_id, m.component_id, m.status, m.name_evidence, m.version_evidence, m.reason,
                    a.asset_id, a.hostname, a.criticality, a.exposure,
                    c.name AS component, c.version AS component_version,
                    v.cve_id, v.cvss_score, v.cvss_version,
@@ -139,6 +141,62 @@ def sensitivity_report(db_path=None, config=None):
     """How much does the ranking change if one weight changes by +/-50 percent?"""
     cfg = config if config is not None else scoring.get_config()
     return analysis.sensitivity(list_findings(db_path), cfg)
+
+
+# ---------- review (Accept / Bump / Defer), audit, export ----------
+
+def record_decision(component_id, cve_id, action, reason, analyst, db_path=None):
+    """Save one analyst decision. Raises ValueError with a clear message if it is not valid."""
+    cid, cve_id, action, reason, analyst = decisions.validate_decision(
+        component_id, cve_id, action, reason, analyst)
+    finding = next((f for f in list_ranked(db_path)
+                    if f["component_id"] == cid and f["cve_id"] == cve_id), None)
+    if finding is None:
+        raise ValueError("this finding is not in the current results (run matching first)")
+    conn = get_connection(db_path)
+    try:
+        with conn:
+            decision_id = decisions.add_decision(
+                conn, cid, cve_id, action, reason, analyst,
+                rank=finding["rank"], score=finding["score"])
+    finally:
+        conn.close()
+    return decision_id
+
+
+def list_queue(db_path=None, config=None):
+    """The ranking with the analyst's decisions applied (bumped first, deferred last)."""
+    ranked = list_ranked(db_path, config)
+    conn = get_connection(db_path)
+    try:
+        latest = decisions.latest_decisions(conn)
+    finally:
+        conn.close()
+    return review_queue.build_queue(ranked, latest)
+
+
+def queue_counts(queue):
+    return review_queue.queue_counts(queue)
+
+
+def list_audit(db_path=None):
+    """Every decision ever made, newest first."""
+    init_db(db_path)
+    conn = get_connection(db_path)
+    try:
+        return decisions.list_decisions(conn)
+    finally:
+        conn.close()
+
+
+def export_queue_csv(db_path=None):
+    return reports.queue_to_csv(list_queue(db_path))
+
+
+def export_queue_markdown(db_path=None, generated_at=None):
+    from datetime import datetime, timezone
+    stamp = generated_at or datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return reports.queue_to_markdown(list_queue(db_path), weight_shares(), stamp)
 
 
 # ---------- uploads ----------

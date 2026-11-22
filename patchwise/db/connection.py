@@ -25,11 +25,17 @@ def get_connection(db_path=None):
 
 
 def init_db(db_path=None):
-    """Create the tables from schema.sql (safe to run repeatedly)."""
-    schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
+    """Create the tables (safe to run repeatedly).
+
+    schema.sql is the base schema. Every extra file named schema_*.sql in this
+    folder (for example schema_review.sql) is applied after it, in alphabetical
+    order, so a new feature can add its tables without editing schema.sql.
+    """
+    schema_files = [SCHEMA_PATH] + sorted(SCHEMA_PATH.parent.glob("schema_*.sql"))
     conn = get_connection(db_path)
     try:
-        conn.executescript(schema_sql)
+        for schema_file in schema_files:
+            conn.executescript(schema_file.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
